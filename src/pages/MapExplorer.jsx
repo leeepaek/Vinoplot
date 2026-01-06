@@ -1,41 +1,31 @@
 import React, { useState } from 'react';
-import MapViewer from './components/MapViewer';
-import ParcelModal from './components/ParcelModal';
-import villagesData from './data/index';
-
-// Village list with regions
-const VILLAGES_BY_REGION = {
-    'Côte de Nuits': [
-        'marsannay', 'fixin', 'gevrey-chambertin', 'morey-saint-denis',
-        'chambolle-musigny', 'vougeot', 'vosne-romanee', 'flagey-echezeaux',
-        'nuits-saint-georges'
-    ],
-    'Côte de Beaune': [
-        'aloxe-corton', 'pernand-vergelesses', 'savigny-les-beaune', 'beaune',
-        'pommard', 'volnay', 'meursault', 'puligny-montrachet',
-        'chassagne-montrachet', 'santenay', 'saint-aubin', 'auxey-duresses',
-        'monthelie', 'maranges', 'ladoix', 'chorey-les-beaune'
-    ],
-    'Côte Chalonnaise': [
-        'bouzeron', 'rully', 'mercurey', 'givry', 'montagny'
-    ],
-    'Mâconnais': [
-        'pouilly-fuisse', 'saint-veran', 'vire-clesse'
-    ],
-    'Chablis': [
-        'chablis'
-    ]
-};
+import MapViewer from '../components/MapViewer';
+import ParcelModal from '../components/ParcelModal';
+import { villagesRegistry, loadVillageData, searchVillages, VILLAGES_BY_REGION } from '../data/index';
 
 function MapExplorer() {
     const [selectedVillage, setSelectedVillage] = useState(null);
+    const [villageData, setVillageData] = useState(null);
     const [selectedParcel, setSelectedParcel] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [searchResults, setSearchResults] = useState([]);
+    const [loadingData, setLoadingData] = useState(false);
+
+    // Load village data when selection changes
+    React.useEffect(() => {
+        if (selectedVillage) {
+            setLoadingData(true);
+            loadVillageData(selectedVillage).then(data => {
+                setVillageData(data);
+                setLoadingData(false);
+            });
+        } else {
+            setVillageData(null);
+        }
+    }, [selectedVillage]);
 
     const handleParcelClick = (parcelInfo) => {
-        // Find the parcel data from JSON
-        const villageData = villagesData[parcelInfo.villageId];
-        if (villageData) {
+        if (villageData && villageData.parcels) {
             const parcel = villageData.parcels.find(p => p.id === parcelInfo.id);
             if (parcel) {
                 setSelectedParcel({
@@ -49,6 +39,7 @@ function MapExplorer() {
     const handleVillageSelect = (villageId) => {
         setSelectedVillage(villageId);
         setSearchTerm('');
+        setSearchResults([]);
     };
 
     const handleSearch = (e) => {
@@ -56,16 +47,29 @@ function MapExplorer() {
         setSearchTerm(term);
 
         if (term.length > 1) {
-            // Simple search - find first matching village
-            const allVillages = Object.values(VILLAGES_BY_REGION).flat();
-            const match = allVillages.find(v =>
-                v.toLowerCase().includes(term.toLowerCase()) ||
-                (villagesData[v]?.koreanName || '').includes(term)
-            );
+            const results = searchVillages(term);
+            setSearchResults(results);
 
-            if (match) {
-                setSelectedVillage(match);
+            // Auto-select if exact match village
+            const exactVillage = results.find(r =>
+                !r.villageId && (r.name.toLowerCase() === term.toLowerCase() || r.koreanName === term)
+            );
+            if (exactVillage) {
+                handleVillageSelect(exactVillage.id);
             }
+        } else {
+            setSearchResults([]);
+        }
+    };
+
+    const handleSearchResultClick = (result) => {
+        if (result.villageId) {
+            // It's a parcel
+            handleVillageSelect(result.villageId);
+            // Optionally we could highlight the parcel, but for now just go to village
+        } else {
+            // It's a village
+            handleVillageSelect(result.id);
         }
     };
 
@@ -81,7 +85,7 @@ function MapExplorer() {
 
             <div className="container mx-auto px-6 py-8">
                 {/* Search Bar */}
-                <div className="mb-8">
+                <div className="mb-8 relative">
                     <input
                         type="text"
                         placeholder="Search villages... (e.g., Vosne, 뫼르소, Chambertin)"
@@ -89,6 +93,22 @@ function MapExplorer() {
                         onChange={handleSearch}
                         className="w-full max-w-2xl px-6 py-4 text-lg border-2 border-amber-300 rounded-lg focus:outline-none focus:border-red-600 shadow-md"
                     />
+                    {searchResults.length > 0 && (
+                        <div className="absolute top-full left-0 w-full max-w-2xl bg-white shadow-xl rounded-b-lg z-50 max-h-60 overflow-y-auto">
+                            {searchResults.map((result) => (
+                                <div
+                                    key={result.id + (result.villageId ? result.villageId : '')}
+                                    onClick={() => handleSearchResultClick(result)}
+                                    className="px-6 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 last:border-0"
+                                >
+                                    <div className="font-semibold text-gray-800">{result.koreanName} ({result.name})</div>
+                                    <div className="text-sm text-gray-500">
+                                        {result.villageId ? `Parcel in ${villagesRegistry[result.villageId]?.koreanName}` : 'Village'}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
@@ -104,7 +124,7 @@ function MapExplorer() {
                                     </h3>
                                     <div className="space-y-1">
                                         {villages.map(villageId => {
-                                            const villageData = villagesData[villageId];
+                                            const vReg = villagesRegistry[villageId];
                                             return (
                                                 <button
                                                     key={villageId}
@@ -114,7 +134,7 @@ function MapExplorer() {
                                                             : 'hover:bg-amber-100 text-gray-700'
                                                         }`}
                                                 >
-                                                    {villageData?.koreanName || villageId}
+                                                    {vReg?.koreanName || villageId}
                                                 </button>
                                             );
                                         })}
@@ -127,14 +147,14 @@ function MapExplorer() {
                     {/* Map Display Area */}
                     <div className="lg:col-span-3">
                         <div className="bg-white rounded-lg shadow-xl p-8">
-                            {selectedVillage ? (
+                            {selectedVillage && villageData ? (
                                 <>
                                     <div className="mb-6">
                                         <h2 className="text-3xl font-bold text-red-900">
-                                            {villagesData[selectedVillage]?.koreanName || selectedVillage}
+                                            {villageData.koreanName || selectedVillage}
                                         </h2>
                                         <p className="text-gray-600 mt-1">
-                                            {villagesData[selectedVillage]?.description}
+                                            {villageData.description}
                                         </p>
                                     </div>
 
@@ -149,6 +169,10 @@ function MapExplorer() {
                                         💡 Click on any parcel to view detailed information
                                     </div>
                                 </>
+                            ) : loadingData ? (
+                                <div className="h-96 flex items-center justify-center text-gray-400">
+                                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
+                                </div>
                             ) : (
                                 <div className="h-96 flex items-center justify-center text-gray-400">
                                     <div className="text-center">
