@@ -1,0 +1,79 @@
+{
+    "id": "gevrey-chambertin",
+    "name": "Gevrey-Chambertin",
+    "koreanName": "쥬브레 샹베르탱",
+    "region": "Côte de Nuits",
+    "description": "The King of Wines. Powerful, rich, and complex Pinot Noir.",
+    "parcels": [
+        {
+            "id": "chambertin",
+            "name": "Chambertin",
+            "koreanName": "샹베르탱",
+            "grade": "Grand Cru",
+            "description": "The most famous Grand Cru, known for power and longevity."
+        },
+        {
+            "id": "chambertin-clos-de-beze",
+            "name": "Chambertin-Clos de Bèze",
+            "koreanName": "샹베르탱 클로 드 베즈",
+            "grade": "Grand Cru",
+            "description": "Complex, elegant, and often more aromatic than Chambertin."
+        },
+        {
+            "id": "mazis-chambertin",
+            "name": "Mazis-Chambertin",
+            "koreanName": "마지 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Rich and structured, located near Clos de Bèze."
+        },
+        {
+            "id": "ruchottes-chambertin",
+            "name": "Ruchottes-Chambertin",
+            "koreanName": "뤼쇼트 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Known for finesse and elegance, located on the upper slope."
+        },
+        {
+            "id": "chapelle-chambertin",
+            "name": "Chapelle-Chambertin",
+            "koreanName": "샤펠 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Below Clos de Bèze, often lighter and more accessible."
+        },
+        {
+            "id": "griotte-chambertin",
+            "name": "Griotte-Chambertin",
+            "koreanName": "그리오트 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Smallest Grand Cru, known for cherry notes (Griotte)."
+        },
+        {
+            "id": "latricieres-chambertin",
+            "name": "Latricières-Chambertin",
+            "koreanName": "라트리시에르 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Mineral-driven and elegant, south of Chambertin."
+        },
+        {
+            "id": "charmes-chambertin",
+            "name": "Charmes-Chambertin",
+            "koreanName": "샤름 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Supple and round, one of the largest Grand Crus."
+        },
+        {
+            "id": "mazoyeres-chambertin",
+            "name": "Mazoyères-Chambertin",
+            "koreanName": "마주아요레 샹베르탱",
+            "grade": "Grand Cru",
+            "description": "Often labeled as Charmes-Chambertin, located lower on the slope."
+        },
+        {
+            "id": "clos-saint-jacques",
+            "name": "Clos Saint-Jacques",
+            "koreanName": "클로 생 자크",
+            "grade": "Premier Cru",
+            "description": "Often considered equal to Grand Crus, located on a separate hill."
+        }
+    ]
+}
