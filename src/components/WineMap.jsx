@@ -55,17 +55,30 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
 
     const eventHandlers = useMemo(() => ({
         click: (e) => {
+            // 이벤트 전파 방지 (다른 레이어 클릭 방지)
+            if (e.originalEvent) {
+                e.originalEvent.stopPropagation();
+            }
+
             const map = e.target._map;
+            // 부드러운 줌 이동
             map.fitBounds(e.target.getBounds(), { padding: [50, 50], duration: 1 });
-            if (onClick) onClick(parcel.id);
+
+            // 데이터 매칭 정확도 향상: parcel.id가 유효한지 확인 후 실행
+            if (onClick && parcel && parcel.id) {
+                onClick(parcel.id);
+            } else {
+                console.warn('Click detected but missing parcel ID or onClick handler', parcel);
+            }
         }
-    }), [parcel.id, onClick]);
+    }), [parcel, onClick]);
 
     return (
         <Polygon
             positions={parcel.coordinates}
             pathOptions={pathOptions}
             eventHandlers={eventHandlers}
+            className="cursor-pointer"
         >
             <Tooltip sticky direction="top" opacity={1} className="custom-tooltip-leaflet">
                 <div className="font-sans text-sm font-bold text-black">
