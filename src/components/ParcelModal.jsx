@@ -4,9 +4,14 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
+        let timer;
         if (parcel) {
-            setIsVisible(true);
+            // 애니메이션을 위해 약간의 지연 후 표시
+            timer = requestAnimationFrame(() => setIsVisible(true));
         }
+        return () => {
+             if (timer) cancelAnimationFrame(timer);
+        };
     }, [parcel]);
 
     const handleClose = () => {
