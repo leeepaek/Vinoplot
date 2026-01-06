@@ -1,29 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+
+// Simple in-memory cache to prevent redundant network requests
+const svgCache = {};
 
 const MapViewer = ({ villageId, onParcelClick }) => {
     const [svgContent, setSvgContent] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const containerRef = useRef(null);
 
+    // Load SVG logic with caching
     useEffect(() => {
         if (!villageId) return;
+
+        // Check cache first
+        if (svgCache[villageId]) {
+            setSvgContent(svgCache[villageId]);
+            setLoading(false);
+            setError(null);
+            return;
+        }
 
         const loadSvg = async () => {
             setLoading(true);
             setError(null);
 
             try {
+                // Determine path - checking if it's a known vector map or needing fallback
                 const response = await fetch(`/src/assets/maps/${villageId}.svg`);
                 if (!response.ok) {
-                    throw new Error(`Failed to load map for ${villageId}`);
+                    throw new Error(`Map not available for ${villageId}`);
                 }
 
                 const svgText = await response.text();
+                // Store in cache
+                svgCache[villageId] = svgText;
                 setSvgContent(svgText);
             } catch (err) {
-                console.error('Error loading SVG:', err);
+                console.warn('Error loading SVG:', err);
                 setError(err.message);
+                setSvgContent(null);
             } finally {
                 setLoading(false);
             }
@@ -32,20 +49,25 @@ const MapViewer = ({ villageId, onParcelClick }) => {
         loadSvg();
     }, [villageId]);
 
+    // Event listener attachment logic
     useEffect(() => {
-        if (!svgContent) return;
+        if (!svgContent || !containerRef.current) return;
 
-        // Add click handlers to all paths in the SVG
-        const container = document.getElementById('svg-map-container');
-        if (!container) return;
-
+        const container = containerRef.current;
+        // Select all paths that have an ID (representing parcels)
         const paths = container.querySelectorAll('path[id]');
 
         const handleClick = (event) => {
-            const parcelId = event.currentTarget.getAttribute('id');
-            const parcelName = event.currentTarget.getAttribute('data-name');
+            // Stop propagation to prevent bubbling if nested
+            event.stopPropagation();
 
-            if (onParcelClick) {
+            const target = event.currentTarget;
+            const parcelId = target.getAttribute('id');
+            const parcelName = target.getAttribute('data-name');
+
+            // Visual feedback handled by CSS (hover), but we could add active state here if needed
+
+            if (onParcelClick && parcelId) {
                 onParcelClick({
                     id: parcelId,
                     name: parcelName,
@@ -59,7 +81,7 @@ const MapViewer = ({ villageId, onParcelClick }) => {
             path.addEventListener('click', handleClick);
         });
 
-        // Cleanup
+        // Cleanup function
         return () => {
             paths.forEach(path => {
                 path.removeEventListener('click', handleClick);
@@ -69,10 +91,10 @@ const MapViewer = ({ villageId, onParcelClick }) => {
 
     if (loading) {
         return (
-            <div className="flex items-center justify-center h-96">
+            <div className="flex items-center justify-center h-full min-h-[400px]">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600 mx-auto"></div>
-                    <p className="mt-4 text-gray-600">Loading map...</p>
+                    <p className="mt-4 text-gray-600 font-serif">Loading terroir...</p>
                 </div>
             </div>
         );
@@ -80,10 +102,15 @@ const MapViewer = ({ villageId, onParcelClick }) => {
 
     if (error) {
         return (
-            <div className="flex items-center justify-center h-96">
-                <div className="text-center text-red-600">
-                    <p className="font-semibold">Failed to load map</p>
-                    <p className="text-sm mt-2">{error}</p>
+            <div className="flex items-center justify-center h-full min-h-[400px] bg-zinc-50 rounded-lg">
+                <div className="text-center text-zinc-500 max-w-md px-6">
+                    <span className="text-4xl block mb-4">🗺️</span>
+                    <h3 className="text-lg font-bold text-zinc-700 mb-2">Map Not Available</h3>
+                    <p className="text-sm">{error}</p>
+                    <p className="text-xs mt-4 text-zinc-400">
+                        We are currently digitizing this region. <br/>
+                        Please try <b>Gevrey-Chambertin</b> for a preview.
+                    </p>
                 </div>
             </div>
         );
@@ -91,17 +118,17 @@ const MapViewer = ({ villageId, onParcelClick }) => {
 
     if (!svgContent) {
         return (
-            <div className="flex items-center justify-center h-96">
-                <p className="text-gray-500">Select a village to view its map</p>
+            <div className="flex items-center justify-center h-full min-h-[400px]">
+                <p className="text-gray-500 italic font-serif">Select a village to explore its vineyards</p>
             </div>
         );
     }
 
     return (
-        <div className="map-viewer-container w-full h-full">
+        <div className="map-viewer-container w-full h-full bg-white transition-opacity duration-500 ease-in-out">
             <div
-                id="svg-map-container"
-                className="w-full h-full flex items-center justify-center"
+                ref={containerRef}
+                className="w-full h-full flex items-center justify-center p-4"
                 dangerouslySetInnerHTML={{ __html: svgContent }}
             />
         </div>
