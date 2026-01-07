@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import MapViewer from '../components/MapViewer';
+import WineMap from '../components/WineMap';
 import ParcelModal from '../components/ParcelModal';
 import villagesData from '../data/index';
 
@@ -138,9 +138,10 @@ function MapExplorer() {
                                         </p>
                                     </div>
 
-                                    <div className="border-2 border-amber-200 rounded-lg overflow-hidden bg-amber-50">
-                                        <MapViewer
-                                            villageId={selectedVillage}
+                                    <div className="border-2 border-amber-200 rounded-lg overflow-hidden bg-amber-50 h-[600px]">
+                                        <WineMap
+                                            data={villagesData[selectedVillage]}
+                                            highlightedId={selectedParcel?.id}
                                             onParcelClick={handleParcelClick}
                                         />
                                     </div>
