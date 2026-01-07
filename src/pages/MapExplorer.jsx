@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
-import MapViewer from './components/MapViewer';
-import ParcelModal from './components/ParcelModal';
-import villagesData from './data/index';
+import MapViewer from '../components/MapViewer';
+import ParcelModal from '../components/ParcelModal';
+import villagesData from '../data/index';
 
 // Village list with regions
 const VILLAGES_BY_REGION = {
     'Côte de Nuits': [
         'marsannay', 'fixin', 'gevrey-chambertin', 'morey-saint-denis',
-        'chambolle-musigny', 'vougeot', 'vosne-romanee', 'flagey-echezeaux',
+        'chambolle-musigny', 'vougeot', 'vosne-romanee',
         'nuits-saint-georges'
     ],
     'Côte de Beaune': [
