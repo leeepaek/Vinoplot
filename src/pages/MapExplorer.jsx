@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import MapViewer from '../components/MapViewer';
 import ParcelModal from '../components/ParcelModal';
 import villagesData from '../data/index';
+import searchIndex from '../data/searchIndex';
 
 // Village list with regions
 const VILLAGES_BY_REGION = {
@@ -51,22 +52,40 @@ function MapExplorer() {
         setSearchTerm('');
     };
 
+    const [searchResults, setSearchResults] = useState([]);
+
     const handleSearch = (e) => {
         const term = e.target.value;
         setSearchTerm(term);
 
         if (term.length > 1) {
-            // Simple search - find first matching village
-            const allVillages = Object.values(VILLAGES_BY_REGION).flat();
-            const match = allVillages.find(v =>
-                v.toLowerCase().includes(term.toLowerCase()) ||
-                (villagesData[v]?.koreanName || '').includes(term)
+            const lowerTerm = term.toLowerCase();
+            const results = searchIndex.filter(item =>
+                item.keywords.some(k => k && k.toLowerCase().includes(lowerTerm))
             );
-
-            if (match) {
-                setSelectedVillage(match);
-            }
+            setSearchResults(results.slice(0, 10)); // Limit to 10 results
+        } else {
+            setSearchResults([]);
         }
+    };
+
+    const handleSearchResultClick = (result) => {
+        if (result.type === 'village') {
+            setSelectedVillage(result.id);
+        } else if (result.type === 'parcel') {
+            setSelectedVillage(result.villageId);
+            // Wait for village to load then select parcel?
+            // For now, just setting the village is a good start,
+            // ideally we would pass an initialParcelId to MapViewer or trigger modal.
+            // Let's trigger the modal directly if we have the data.
+            handleParcelClick({
+                id: result.id,
+                name: result.name,
+                villageId: result.villageId
+            });
+        }
+        setSearchTerm('');
+        setSearchResults([]);
     };
 
     return (
@@ -81,14 +100,40 @@ function MapExplorer() {
 
             <div className="container mx-auto px-6 py-8">
                 {/* Search Bar */}
-                <div className="mb-8">
+                <div className="mb-8 relative">
                     <input
                         type="text"
-                        placeholder="Search villages... (e.g., Vosne, 뫼르소, Chambertin)"
+                        placeholder="Search villages or parcels... (e.g., Vosne, Richebourg, 뫼르소)"
                         value={searchTerm}
                         onChange={handleSearch}
                         className="w-full max-w-2xl px-6 py-4 text-lg border-2 border-amber-300 rounded-lg focus:outline-none focus:border-red-600 shadow-md"
                     />
+                    {searchResults.length > 0 && (
+                        <div className="absolute z-10 w-full max-w-2xl mt-2 bg-white rounded-lg shadow-xl border border-amber-200 max-h-96 overflow-y-auto">
+                            {searchResults.map((result, idx) => (
+                                <div
+                                    key={`${result.type}-${result.id}-${idx}`}
+                                    onClick={() => handleSearchResultClick(result)}
+                                    className="px-6 py-3 hover:bg-amber-50 cursor-pointer border-b border-gray-100 last:border-0"
+                                >
+                                    <div className="flex justify-between items-center">
+                                        <div>
+                                            <span className="font-bold text-red-900">{result.koreanName || result.name}</span>
+                                            <span className="text-xs ml-2 px-2 py-0.5 rounded bg-gray-200 text-gray-600 uppercase">{result.type}</span>
+                                        </div>
+                                        {result.type === 'parcel' && (
+                                            <span className="text-sm text-gray-500">{villagesData[result.villageId]?.koreanName}</span>
+                                        )}
+                                    </div>
+                                    {result.type === 'parcel' && (
+                                        <div className="text-xs text-gray-400 mt-1">
+                                            {result.grade} • Producers: {result.producers?.length || 0}
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
