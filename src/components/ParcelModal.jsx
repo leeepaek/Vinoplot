@@ -5,7 +5,11 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
 
     useEffect(() => {
         if (parcel) {
-            setIsVisible(true);
+            // Use requestAnimationFrame to defer the state update slightly, ensuring it runs after the render cycle completes
+            // This prevents the synchronous setState in effect warning while maintaining the animation trigger
+            requestAnimationFrame(() => {
+                setIsVisible(true);
+            });
         }
     }, [parcel]);
 
