@@ -14,7 +14,7 @@ const MapViewer = ({ villageId, onParcelClick }) => {
             setError(null);
 
             try {
-                const response = await fetch(`/src/assets/maps/${villageId}.svg`);
+                const response = await fetch(`/maps/${villageId}.svg`);
                 if (!response.ok) {
                     throw new Error(`Failed to load map for ${villageId}`);
                 }
