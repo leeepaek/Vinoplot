@@ -14,7 +14,8 @@ const MapViewer = ({ villageId, onParcelClick }) => {
             setError(null);
 
             try {
-                const response = await fetch(`/src/assets/maps/${villageId}.svg`);
+                // Strictly load SVG from public/maps/
+                const response = await fetch(`/maps/${villageId}.svg`);
                 if (!response.ok) {
                     throw new Error(`Failed to load map for ${villageId}`);
                 }
@@ -39,11 +40,15 @@ const MapViewer = ({ villageId, onParcelClick }) => {
         const container = document.getElementById('svg-map-container');
         if (!container) return;
 
+        // Explicitly target path elements with an ID (parcels)
         const paths = container.querySelectorAll('path[id]');
 
         const handleClick = (event) => {
             const parcelId = event.currentTarget.getAttribute('id');
             const parcelName = event.currentTarget.getAttribute('data-name');
+
+            // Verify binding
+            console.log('Parcel clicked:', parcelId, parcelName);
 
             if (onParcelClick) {
                 onParcelClick({
@@ -84,6 +89,7 @@ const MapViewer = ({ villageId, onParcelClick }) => {
                 <div className="text-center text-red-600">
                     <p className="font-semibold">Failed to load map</p>
                     <p className="text-sm mt-2">{error}</p>
+                    <p className="text-xs text-gray-500 mt-1">Please ensure {villageId}.svg exists in public/maps/</p>
                 </div>
             </div>
         );
