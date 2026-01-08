@@ -5,7 +5,10 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
 
     useEffect(() => {
         if (parcel) {
-            setIsVisible(true);
+            // Trigger animation in next frame
+            requestAnimationFrame(() => {
+                setIsVisible(true);
+            });
         }
     }, [parcel]);
 
