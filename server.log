@@ -1,0 +1,113 @@
+
+> vinoplot@0.0.0 dev
+> vite
+
+4:17:25 PM [vite] (client) Re-optimizing dependencies because lockfile has changed
+
+  VITE v7.3.0  ready in 290 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+4:18:17 PM [vite] Internal server error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 2)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+4:18:17 PM [vite] (client) Pre-transform error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+4:19:02 PM [vite] (client) hmr update /src/App.jsx, /src/index.css
+4:19:07 PM [vite] (client) Pre-transform error: Failed to resolve import "./villages/chablis.json" from "src/data/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/data/index.js:38:21
+  36 |  // import saintVeran from './villages/saint-veran.json';
+  37 |  // import vireClesse from './villages/vire-clesse.json';
+  38 |  import chablis from './villages/chablis.json'; // Keep chablis to avoid undefined if referenced, but comment out in e...
+     |                       ^
+  39 |  // Wait, I need to remove them from the export object too.
+  40 |
+4:19:07 PM [vite] Internal server error: Failed to resolve import "./villages/chablis.json" from "src/data/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/data/index.js:38:21
+  36 |  // import saintVeran from './villages/saint-veran.json';
+  37 |  // import vireClesse from './villages/vire-clesse.json';
+  38 |  import chablis from './villages/chablis.json'; // Keep chablis to avoid undefined if referenced, but comment out in e...
+     |                       ^
+  39 |  // Wait, I need to remove them from the export object too.
+  40 |
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+      at async viteTransformMiddleware (file:///app/node_modules/vite/dist/node/chunks/config.js:24541:20)
+4:19:07 PM [vite] (client) ✨ new dependencies optimized: react-leaflet
+4:19:07 PM [vite] (client) ✨ optimized dependencies changed. reloading
+4:19:07 PM [vite] (client) Pre-transform error: Failed to resolve import "./villages/chablis.json" from "src/data/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/data/index.js:38:21
+  36 |  // import saintVeran from './villages/saint-veran.json';
+  37 |  // import vireClesse from './villages/vire-clesse.json';
+  38 |  import chablis from './villages/chablis.json'; // Keep chablis to avoid undefined if referenced, but comment out in e...
+     |                       ^
+  39 |  // Wait, I need to remove them from the export object too.
+  40 |
+4:19:07 PM [vite] Internal server error: Failed to resolve import "./villages/chablis.json" from "src/data/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/data/index.js:38:21
+  36 |  // import saintVeran from './villages/saint-veran.json';
+  37 |  // import vireClesse from './villages/vire-clesse.json';
+  38 |  import chablis from './villages/chablis.json'; // Keep chablis to avoid undefined if referenced, but comment out in e...
+     |                       ^
+  39 |  // Wait, I need to remove them from the export object too.
+  40 |
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+      at async viteTransformMiddleware (file:///app/node_modules/vite/dist/node/chunks/config.js:24541:20)
+4:19:29 PM [vite] Internal server error: Failed to resolve import "./villages/chablis.json" from "src/data/index.js". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/data/index.js:38:21
+  36 |  // import saintVeran from './villages/saint-veran.json';
+  37 |  // import vireClesse from './villages/vire-clesse.json';
+  38 |  import chablis from './villages/chablis.json'; // Keep chablis to avoid undefined if referenced, but comment out in e...
+     |                       ^
+  39 |  // Wait, I need to remove them from the export object too.
+  40 |
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+      at async viteTransformMiddleware (file:///app/node_modules/vite/dist/node/chunks/config.js:24541:20)
+4:20:01 PM [vite] (client) hmr update /src/index.css, /src/pages/MapExplorer.jsx

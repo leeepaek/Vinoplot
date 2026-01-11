@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import MapViewer from './components/MapViewer';
-import ParcelModal from './components/ParcelModal';
-import villagesData from './data/index';
+import WineMap from '../components/WineMap';
+import ParcelModal from '../components/ParcelModal';
+import villagesData from '../data/index';
 
 // Village list with regions
 const VILLAGES_BY_REGION = {
@@ -138,10 +138,11 @@ function MapExplorer() {
                                         </p>
                                     </div>
 
-                                    <div className="border-2 border-amber-200 rounded-lg overflow-hidden bg-amber-50">
-                                        <MapViewer
-                                            villageId={selectedVillage}
-                                            onParcelClick={handleParcelClick}
+                                    <div className="border-2 border-amber-200 rounded-lg overflow-hidden bg-amber-50 h-[600px]">
+                                        <WineMap
+                                            data={villagesData[selectedVillage]}
+                                            highlightedId={selectedParcel?.id}
+                                            onParcelClick={(id) => handleParcelClick({ id, villageId: selectedVillage })}
                                         />
                                     </div>
 
