@@ -6,10 +6,14 @@ import 'leaflet/dist/leaflet.css';
 const MapController = ({ center, zoom, highlightedId, parcels }) => {
     const map = useMap();
 
+    // Helper to flip [lng, lat] to [lat, lng]
+    const toLatLng = (coord) => (coord ? [coord[1], coord[0]] : null);
+
     // 1. 기본 센터 이동 (지역 변경 시)
     useEffect(() => {
         if (center) {
-            map.flyTo(center, zoom, { duration: 1.5 });
+            // center is expected to be [lng, lat] from data, convert to [lat, lng]
+            map.flyTo(toLatLng(center), zoom, { duration: 1.5 });
         }
     }, [center, zoom, map]);
 
@@ -18,10 +22,13 @@ const MapController = ({ center, zoom, highlightedId, parcels }) => {
         if (highlightedId && parcels) {
             const targetParcel = parcels.find(p => p.id === highlightedId);
             if (targetParcel && targetParcel.coordinates) {
-                const coords = targetParcel.coordinates[0];
+                // coordinates are [[lng, lat], ...]
+                const coords = targetParcel.coordinates;
                 if (coords && coords.length > 0) {
-                    const latSum = coords.reduce((sum, p) => sum + p[0], 0);
-                    const lngSum = coords.reduce((sum, p) => sum + p[1], 0);
+                    // data is [lng, lat]
+                    // sum lat (p[1]) and lng (p[0])
+                    const latSum = coords.reduce((sum, p) => sum + p[1], 0);
+                    const lngSum = coords.reduce((sum, p) => sum + p[0], 0);
                     const centerLat = latSum / coords.length;
                     const centerLng = lngSum / coords.length;
 
@@ -61,9 +68,15 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
         }
     }), [parcel.id, onClick]);
 
+    // Convert coordinates from [lng, lat] to [lat, lng]
+    const latLngCoordinates = useMemo(() => {
+        if (!parcel.coordinates) return [];
+        return parcel.coordinates.map(coord => [coord[1], coord[0]]);
+    }, [parcel.coordinates]);
+
     return (
         <Polygon
-            positions={parcel.coordinates}
+            positions={latLngCoordinates}
             pathOptions={pathOptions}
             eventHandlers={eventHandlers}
         >
@@ -87,10 +100,13 @@ const WineMap = ({ data, highlightedId, onParcelClick }) => {
 
     const { center, zoom, parcels } = data;
 
+    // Helper to flip [lng, lat] to [lat, lng]
+    const toLatLng = (coord) => (coord ? [coord[1], coord[0]] : [47.1852, 4.9431]);
+
     return (
         <div className="w-full h-full relative bg-zinc-900 border-l border-zinc-800">
             <MapContainer
-                center={center || [47.1852, 4.9431]}
+                center={toLatLng(center)}
                 zoom={zoom || 14}
                 style={{ height: '100%', width: '100%', background: '#1a1a1a' }}
                 scrollWheelZoom={true}
