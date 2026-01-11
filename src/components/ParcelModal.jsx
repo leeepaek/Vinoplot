@@ -5,7 +5,9 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
 
     useEffect(() => {
         if (parcel) {
-            setIsVisible(true);
+            requestAnimationFrame(() => {
+                setIsVisible(true);
+            });
         }
     }, [parcel]);
 
