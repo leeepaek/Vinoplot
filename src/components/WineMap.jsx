@@ -17,13 +17,26 @@ const MapController = ({ center, zoom, highlightedId, parcels }) => {
     useEffect(() => {
         if (highlightedId && parcels) {
             const targetParcel = parcels.find(p => p.id === highlightedId);
-            if (targetParcel && targetParcel.coordinates) {
-                const coords = targetParcel.coordinates[0];
-                if (coords && coords.length > 0) {
-                    const latSum = coords.reduce((sum, p) => sum + p[0], 0);
-                    const lngSum = coords.reduce((sum, p) => sum + p[1], 0);
-                    const centerLat = latSum / coords.length;
-                    const centerLng = lngSum / coords.length;
+            if (targetParcel && targetParcel.coordinates && targetParcel.coordinates.length > 0) {
+                let points = [];
+                // Handle both Polygon (array of points) and MultiPolygon (array of array of points)
+                // If coordinates[0] is an array of numbers (e.g., [lat, lng]), it's a Polygon
+                // If coordinates[0] is an array of arrays (e.g., [[lat, lng], ...]), it's a MultiPolygon
+
+                const firstItem = targetParcel.coordinates[0];
+                if (Array.isArray(firstItem) && typeof firstItem[0] === 'number') {
+                    // Simple Polygon
+                    points = targetParcel.coordinates;
+                } else if (Array.isArray(firstItem) && Array.isArray(firstItem[0])) {
+                    // MultiPolygon - Flatten to get all points for centroid
+                    points = targetParcel.coordinates.flat();
+                }
+
+                if (points.length > 0) {
+                    const latSum = points.reduce((sum, p) => sum + p[0], 0);
+                    const lngSum = points.reduce((sum, p) => sum + p[1], 0);
+                    const centerLat = latSum / points.length;
+                    const centerLng = lngSum / points.length;
 
                     map.flyTo([centerLat, centerLng], 16, { duration: 1.0 });
                 }
@@ -41,9 +54,10 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
     const isVillage = !isGrand && !isPremier;
 
     // 등급별 색상 정의
-    const baseColor = isGrand ? '#D4AF37' :  // Gold
-        isPremier ? '#FB923C' : // Orange-400 (Amber)
-            '#A1A1AA';              // Zinc-400 (Silver)
+    // Grand Cru: #8B0000, Premier Cru: #B8860B, Village: #DAA520
+    const baseColor = isGrand ? '#8B0000' :
+        isPremier ? '#B8860B' :
+            '#DAA520';
 
     const pathOptions = useMemo(() => ({
         color: isHighlighted ? '#ffffff' : baseColor,
@@ -138,15 +152,15 @@ const WineMap = ({ data, highlightedId, onParcelClick }) => {
             <div className="absolute bottom-6 right-6 bg-zinc-900/90 backdrop-blur border border-zinc-700 p-4 rounded-xl z-[1000]">
                 <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Legend</h4>
                 <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#D4AF37] opacity-80 border border-[#D4AF37]"></div>
+                    <div className="w-3 h-3 bg-[#8B0000] opacity-80 border border-[#8B0000]"></div>
                     <span className="text-xs text-zinc-300">Grand Cru</span>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#FB923C] opacity-80 border border-[#FB923C] border-dashed"></div>
+                    <div className="w-3 h-3 bg-[#B8860B] opacity-80 border border-[#B8860B] border-dashed"></div>
                     <span className="text-xs text-zinc-300">Premier Cru</span>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#A1A1AA] opacity-80 border border-[#A1A1AA]"></div>
+                    <div className="w-3 h-3 bg-[#DAA520] opacity-80 border border-[#DAA520]"></div>
                     <span className="text-xs text-zinc-300">Village (Lieu-dit)</span>
                 </div>
             </div>
