@@ -5,7 +5,8 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
 
     useEffect(() => {
         if (parcel) {
-            setIsVisible(true);
+            const timer = setTimeout(() => setIsVisible(true), 10);
+            return () => clearTimeout(timer);
         }
     }, [parcel]);
 

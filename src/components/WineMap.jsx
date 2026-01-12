@@ -2,7 +2,7 @@ import React, { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Polygon, Tooltip, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// 밭 뷰 조작을 위한 내부 컴포넌트
+// 밭 뷰 조작을 위한 내부 컴포넌트 (Interactive Map Controller)
 const MapController = ({ center, zoom, highlightedId, parcels }) => {
     const map = useMap();
 
