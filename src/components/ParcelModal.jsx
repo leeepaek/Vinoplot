@@ -70,6 +70,36 @@ const ParcelModal = ({ parcel, onClose, onSearch }) => {
                         </p>
                     )}
 
+                    {/* 1.5. Metadata (Area, Altitude, Soil) */}
+                    {parcel.metadata && (
+                        <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800 grid grid-cols-2 gap-4">
+                             {parcel.metadata.area && (
+                                <div>
+                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Area</h4>
+                                    <p className="text-sm text-zinc-300">{parcel.metadata.area}</p>
+                                </div>
+                             )}
+                             {parcel.metadata.altitude && (
+                                <div>
+                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Altitude</h4>
+                                    <p className="text-sm text-zinc-300">{parcel.metadata.altitude}</p>
+                                </div>
+                             )}
+                             {parcel.metadata.exposure && (
+                                <div>
+                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Exposure</h4>
+                                    <p className="text-sm text-zinc-300">{parcel.metadata.exposure}</p>
+                                </div>
+                             )}
+                             {parcel.metadata.soil && (
+                                <div className="col-span-2">
+                                    <h4 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-1">Soil</h4>
+                                    <p className="text-sm text-zinc-300">{parcel.metadata.soil}</p>
+                                </div>
+                             )}
+                        </div>
+                    )}
+
                     {/* 2. Terroir (데이터가 있을 경우만) */}
                     {parcel.terroir && (
                         <div className="bg-zinc-950/50 p-4 rounded-xl border border-zinc-800">
