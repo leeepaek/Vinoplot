@@ -7,7 +7,10 @@ import { geoData } from '../data/mockGeoData';
 function FocusMap({ center }) {
     const map = useMap();
     useEffect(() => {
-        map.flyTo(center, 15, { duration: 2 });
+        // center is expected to be [lat, lng]
+        if (center) {
+            map.flyTo(center, 15, { duration: 2 });
+        }
     }, [center, map]);
     return null;
 }
@@ -58,14 +61,19 @@ const RealWineMap = ({ highlightQuery }) => {
         )
         : null;
 
+    // Helper to flip [lng, lat] to [lat, lng]
+    const toLatLng = (coord) => [coord[1], coord[0]];
+
     // 중심 좌표 설정 (타겟이 있으면 타겟 중심, 없으면 전체 중심)
-    // Polygon 좌표가 [[lat, lng], ...] 형태이므로 첫 좌표를 대략적 중심으로 사용
-    const center = targetParcel ? targetParcel.coordinates[0] : geoData.center;
+    // Polygon 좌표가 [[lng, lat], ...] 형태이므로 변환 필요
+    const rawCenter = targetParcel ? targetParcel.coordinates[0] : geoData.center;
+    const center = toLatLng(rawCenter);
+    const initialCenter = toLatLng(geoData.center);
 
     return (
         <div className="w-full h-[600px] rounded-3xl overflow-hidden shadow-2xl border border-zinc-800 z-0 relative">
             <MapContainer
-                center={geoData.center}
+                center={initialCenter}
                 zoom={geoData.zoom}
                 style={{ height: '100%', width: '100%', background: '#1c1c1c' }}
                 scrollWheelZoom={false}
@@ -81,7 +89,7 @@ const RealWineMap = ({ highlightQuery }) => {
                 {geoData.parcels.map((parcel) => (
                     <Polygon
                         key={parcel.id}
-                        positions={parcel.coordinates}
+                        positions={parcel.coordinates.map(toLatLng)}
                         pathOptions={getStyle(parcel)}
                     >
                         <Popup className="custom-popup">

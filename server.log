@@ -1,0 +1,120 @@
+
+> vinoplot@0.0.0 dev
+> vite
+
+
+  VITE v7.3.0  ready in 362 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+(!) Failed to run dependency scan. Skipping dependency pre-bundling. Error: The following dependencies are imported but could not be resolved:
+
+  react-router-dom (imported by /app/src/App.jsx)
+
+Are they installed?
+    at file:///app/node_modules/vite/dist/node/chunks/config.js:31902:33
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async file:///app/node_modules/vite/dist/node/chunks/config.js:34110:15
+2:03:45 PM [vite] (client) Pre-transform error: Failed to resolve import "react-router-dom" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/App.jsx:1:61
+  1  |  import { jsxDEV } from "react/jsx-dev-runtime";
+  2  |  import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+     |                                                                ^
+  3  |  import MapExplorer from "./pages/MapExplorer";
+  4  |  import "./App.css";
+2:03:46 PM [vite] (client) Pre-transform error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+2:03:46 PM [vite] Internal server error: Failed to resolve import "react-router-dom" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/App.jsx:1:61
+  1  |  import { jsxDEV } from "react/jsx-dev-runtime";
+  2  |  import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+     |                                                                ^
+  3  |  import MapExplorer from "./pages/MapExplorer";
+  4  |  import "./App.css";
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+      at async viteTransformMiddleware (file:///app/node_modules/vite/dist/node/chunks/config.js:24541:20)
+2:03:46 PM [vite] (client) Pre-transform error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+2:03:46 PM [vite] (client) ✨ new dependencies optimized: react-dom/client
+2:03:46 PM [vite] (client) ✨ optimized dependencies changed. reloading
+2:03:46 PM [vite] (client) Pre-transform error: Failed to resolve import "react-router-dom" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/App.jsx:1:61
+  1  |  import { jsxDEV } from "react/jsx-dev-runtime";
+  2  |  import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+     |                                                                ^
+  3  |  import MapExplorer from "./pages/MapExplorer";
+  4  |  import "./App.css";
+2:03:46 PM [vite] (client) Pre-transform error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+2:03:46 PM [vite] Internal server error: Failed to resolve import "react-router-dom" from "src/App.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/App.jsx:1:61
+  1  |  import { jsxDEV } from "react/jsx-dev-runtime";
+  2  |  import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+     |                                                                ^
+  3  |  import MapExplorer from "./pages/MapExplorer";
+  4  |  import "./App.css";
+      at TransformPluginContext._formatLog (file:///app/node_modules/vite/dist/node/chunks/config.js:28998:43)
+      at TransformPluginContext.error (file:///app/node_modules/vite/dist/node/chunks/config.js:28995:14)
+      at normalizeUrl (file:///app/node_modules/vite/dist/node/chunks/config.js:27118:18)
+      at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+      at async file:///app/node_modules/vite/dist/node/chunks/config.js:27176:32
+      at async Promise.all (index 1)
+      at async TransformPluginContext.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:27144:4)
+      at async EnvironmentPluginContainer.transform (file:///app/node_modules/vite/dist/node/chunks/config.js:28796:14)
+      at async loadAndTransform (file:///app/node_modules/vite/dist/node/chunks/config.js:22669:26)
+      at async viteTransformMiddleware (file:///app/node_modules/vite/dist/node/chunks/config.js:24541:20)
+2:03:46 PM [vite] (client) Pre-transform error: Failed to resolve import "./components/MapViewer" from "src/pages/MapExplorer.jsx". Does the file exist?
+  Plugin: vite:import-analysis
+  File: /app/src/pages/MapExplorer.jsx:2:22
+  2  |  var _s = $RefreshSig$();
+  3  |  import React, { useState } from "react";
+  4  |  import MapViewer from "./components/MapViewer";
+     |                         ^
+  5  |  import ParcelModal from "./components/ParcelModal";
+  6  |  import villagesData from "./data/index";
+2:05:06 PM [vite] (client) page reload src/pages/MapExplorer.jsx
+2:05:31 PM [vite] (client) hmr update /src/index.css
+2:05:32 PM [vite] (client) page reload src/pages/VerifyPage.jsx
+2:05:33 PM [vite] (client) page reload src/App.jsx
+2:05:53 PM [vite] (client) ✨ new dependencies optimized: react-router-dom, prop-types, react-leaflet
+2:05:53 PM [vite] (client) ✨ optimized dependencies changed. reloading
+2:09:16 PM [vite] (client) hmr update /src/index.css, /src/pages/MapExplorer.jsx
+2:09:16 PM [vite] (client) hmr update /src/pages/VerifyPage.jsx, /src/index.css
+2:09:17 PM [vite] (client) hmr update /src/App.jsx, /src/index.css
+2:09:40 PM [vite] (client) hmr update /src/index.css, /src/pages/MapExplorer.jsx
+2:20:13 PM [vite] (client) hmr update /src/App.jsx, /src/index.css
+2:20:49 PM [vite] (client) hmr update /src/pages/VosneVis.jsx, /src/index.css
+2:20:50 PM [vite] (client) hmr update /src/App.jsx, /src/index.css
