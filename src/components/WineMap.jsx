@@ -81,7 +81,7 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
             '#A1A1AA';
 
     const pathOptions = useMemo(() => ({
-        color: isHighlighted ? '#ffffff' : baseColor,
+        color: isHighlighted ? '#FFD700' : baseColor, // Gold highlight
         weight: isHighlighted ? 3 : 1.5,
         fillColor: baseColor,
         fillOpacity: isHighlighted ? 0.4 : (isVillage ? 0.15 : 0.05),
