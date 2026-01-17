@@ -37,6 +37,9 @@ import pouillyFuisse from './villages/pouilly-fuisse.json';
 import saintVeran from './villages/saint-veran.json';
 import vireClesse from './villages/vire-clesse.json';
 
+// Global Search Index (Pre-built)
+import globalSearchIndex from './global_search_index.json';
+
 // 모든 데이터를 하나의 객체로 매핑
 const villages = {
     [chablis.id]: chablis,
@@ -79,41 +82,7 @@ const villages = {
     [vireClesse.id]: vireClesse,
 };
 
-// 검색을 위한 평탄화된 데이터 리스트 (Fuzzy Search 용)
-export const searchIndex = Object.values(villages).flatMap(village => {
-    // 1. 마을 자체 정보
-    const items = [{
-        type: 'village',
-        id: village.id,
-        name: village.name,
-        koreanName: village.koreanName,
-        keywords: [village.name, village.koreanName, village.description, village.region],
-        data: village
-    }];
-
-    // 2. 마을 내의 밭(Parcels) 정보
-    if (village.parcels) {
-        village.parcels.forEach(parcel => {
-            items.push({
-                type: 'parcel',
-                id: parcel.id,
-                name: parcel.name,
-                koreanName: parcel.koreanName,
-                keywords: [
-                    parcel.name,
-                    parcel.koreanName,
-                    village.name,
-                    village.koreanName,
-                    ...(parcel.producers || []) // 생산자 정보도 키워드에 포함
-                ],
-                grade: parcel.grade || parcel.classification,
-                villageId: village.id,
-                producers: parcel.producers, // 생산자 데이터 직접 접근용
-                data: parcel
-            });
-        });
-    }
-    return items;
-});
+// Export pre-built index
+export const searchIndex = globalSearchIndex;
 
 export default villages;

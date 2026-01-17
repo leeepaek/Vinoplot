@@ -1,52 +1,87 @@
 import React, { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Polygon, Tooltip, useMap } from 'react-leaflet';
+import villagesData from '../data/index';
 import 'leaflet/dist/leaflet.css';
 
-// 밭 뷰 조작을 위한 내부 컴포넌트
+// Helper to flip coordinates from [Lon, Lat] (GeoJSON) to [Lat, Lon] (Leaflet)
+// GeoJSON: [x, y], Leaflet: [y, x]
+// Input might be Polygon (array of rings) or MultiPolygon (array of polygons)
+const flipCoordinates = (coords) => {
+    if (!coords) return [];
+
+    // Check depth to detect Polygon vs MultiPolygon
+    // Polygon: [ [ [Lon, Lat], ... ], ... ] -> Depth 3
+    // MultiPolygon: [ [ [ [Lon, Lat], ... ], ... ] ] -> Depth 4
+
+    const getDepth = (arr) => Array.isArray(arr) ? 1 + getDepth(arr[0]) : 0;
+    const depth = getDepth(coords);
+
+    if (depth === 3) {
+        // Polygon
+        return coords.map(ring => ring.map(pt => [pt[1], pt[0]]));
+    } else if (depth === 4) {
+        // MultiPolygon
+        return coords.map(poly => poly.map(ring => ring.map(pt => [pt[1], pt[0]])));
+    }
+    return coords;
+};
+
+// Calculate approximate center of a polygon or multipolygon
+const calculateCenter = (coords) => {
+    if (!coords || coords.length === 0) return null;
+
+    // Flatten to list of points
+    const points = [];
+    const getDepth = (arr) => Array.isArray(arr) ? 1 + getDepth(arr[0]) : 0;
+    const depth = getDepth(coords);
+
+    if (depth === 3) { // Polygon
+        coords[0].forEach(p => points.push(p));
+    } else if (depth === 4) { // MultiPolygon
+        coords.forEach(poly => poly[0].forEach(p => points.push(p)));
+    }
+
+    if (points.length === 0) return null;
+
+    const sum = points.reduce((acc, p) => [acc[0] + p[0], acc[1] + p[1]], [0, 0]);
+    // Return [Lon, Lat] -> [Lat, Lon]
+    return [sum[1] / points.length, sum[0] / points.length];
+};
+
 const MapController = ({ center, zoom, highlightedId, parcels }) => {
     const map = useMap();
 
-    // 1. 기본 센터 이동 (지역 변경 시)
     useEffect(() => {
+        if (highlightedId && parcels) {
+            const parcel = parcels.find(p => p.id === highlightedId);
+            if (parcel && parcel.coordinates) {
+                 const target = calculateCenter(parcel.coordinates);
+                 if (target) {
+                     map.flyTo(target, 16, { duration: 1.5 });
+                     return;
+                 }
+            }
+        }
+
         if (center) {
             map.flyTo(center, zoom, { duration: 1.5 });
         }
-    }, [center, zoom, map]);
-
-    // 2. 하이라이트된 밭으로 이동 (리스트 클릭 시)
-    useEffect(() => {
-        if (highlightedId && parcels) {
-            const targetParcel = parcels.find(p => p.id === highlightedId);
-            if (targetParcel && targetParcel.coordinates) {
-                const coords = targetParcel.coordinates[0];
-                if (coords && coords.length > 0) {
-                    const latSum = coords.reduce((sum, p) => sum + p[0], 0);
-                    const lngSum = coords.reduce((sum, p) => sum + p[1], 0);
-                    const centerLat = latSum / coords.length;
-                    const centerLng = lngSum / coords.length;
-
-                    map.flyTo([centerLat, centerLng], 16, { duration: 1.0 });
-                }
-            }
-        }
-    }, [highlightedId, parcels, map]);
+    }, [center, zoom, map, highlightedId, parcels]);
 
     return null;
 };
 
-// 개별 폴리곤 컴포넌트 (Memoization 적용)
 const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
     const isGrand = parcel.grade === 'Grand Cru';
     const isPremier = parcel.grade === 'Premier Cru';
     const isVillage = !isGrand && !isPremier;
 
-    // 등급별 색상 정의
-    const baseColor = isGrand ? '#D4AF37' :  // Gold
-        isPremier ? '#FB923C' : // Orange-400 (Amber)
-            '#A1A1AA';              // Zinc-400 (Silver)
+    const baseColor = isGrand ? '#D4AF37' :
+        isPremier ? '#FB923C' :
+            '#A1A1AA';
 
     const pathOptions = useMemo(() => ({
-        color: isHighlighted ? '#ffffff' : baseColor,
+        color: isHighlighted ? '#FFD700' : baseColor, // Gold highlight
         weight: isHighlighted ? 3 : 1.5,
         fillColor: baseColor,
         fillOpacity: isHighlighted ? 0.4 : (isVillage ? 0.15 : 0.05),
@@ -55,15 +90,16 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
 
     const eventHandlers = useMemo(() => ({
         click: (e) => {
-            const map = e.target._map;
-            map.fitBounds(e.target.getBounds(), { padding: [50, 50], duration: 1 });
-            if (onClick) onClick(parcel.id);
+            if (onClick) onClick(parcel);
         }
-    }), [parcel.id, onClick]);
+    }), [parcel, onClick]);
+
+    // Flip coordinates for Leaflet
+    const leafletPositions = useMemo(() => flipCoordinates(parcel.coordinates), [parcel.coordinates]);
 
     return (
         <Polygon
-            positions={parcel.coordinates}
+            positions={leafletPositions}
             pathOptions={pathOptions}
             eventHandlers={eventHandlers}
         >
@@ -79,52 +115,40 @@ const ParcelPolygon = React.memo(({ parcel, isHighlighted, onClick }) => {
     );
 });
 
-const WineMap = ({ data, highlightedId, onParcelClick }) => {
+const WineMap = ({ villageId, onParcelClick, highlightedId }) => {
+    const data = villagesData[villageId];
 
-    if (!data || !data.parcels) {
-        return <div className="text-zinc-500 text-center py-20">No map data available</div>;
+    // Default to Vosne coordinates if no data
+    const center = [47.16, 4.95];
+    const zoom = 14;
+
+    if (!data) {
+         return <div className="text-zinc-500 text-center py-20">Select a village to view the map</div>;
     }
-
-    const { center, zoom, parcels } = data;
 
     return (
         <div className="w-full h-full relative bg-zinc-900 border-l border-zinc-800">
             <MapContainer
-                center={center || [47.1852, 4.9431]}
-                zoom={zoom || 14}
+                center={center}
+                zoom={zoom}
                 style={{ height: '100%', width: '100%', background: '#1a1a1a' }}
                 scrollWheelZoom={true}
             >
-                {/* 1. 위성 지도 레이어 (Esri World Imagery) */}
                 <TileLayer
-                    attribution='Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+                    attribution='Tiles &copy; Esri'
                     url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
                 />
 
-                {/* 시인성을 위한 딤 레이어 */}
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.2)', pointerEvents: 'none', zIndex: 400 }}></div>
 
-                {/* 맵 컨트롤러 (FlyTo 로직) */}
                 <MapController
                     center={center}
                     zoom={zoom}
                     highlightedId={highlightedId}
-                    parcels={parcels}
+                    parcels={data.parcels}
                 />
 
-                {/* 데이터 없음 안내 (오버레이) */}
-                {(!parcels || parcels.length === 0) && (
-                    <div className="leaflet-top leaflet-right" style={{ pointerEvents: 'none', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-                        <div className="bg-black/70 backdrop-blur-md text-white px-6 py-4 rounded-xl border border-white/10 shadow-2xl text-center">
-                            <span className="text-2xl mb-2 block">🗺️</span>
-                            <p className="text-sm font-bold">No Vineyard Data Yet</p>
-                            <p className="text-xs text-zinc-400 mt-1">Detailed map coming soon.</p>
-                        </div>
-                    </div>
-                )}
-
-                {/* 폴리곤 리렌더링 최적화 */}
-                {parcels.map(parcel => (
+                {data.parcels && data.parcels.map(parcel => (
                     <ParcelPolygon
                         key={parcel.id}
                         parcel={parcel}
@@ -133,23 +157,6 @@ const WineMap = ({ data, highlightedId, onParcelClick }) => {
                     />
                 ))}
             </MapContainer>
-
-            {/* 범례 */}
-            <div className="absolute bottom-6 right-6 bg-zinc-900/90 backdrop-blur border border-zinc-700 p-4 rounded-xl z-[1000]">
-                <h4 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-2">Legend</h4>
-                <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#D4AF37] opacity-80 border border-[#D4AF37]"></div>
-                    <span className="text-xs text-zinc-300">Grand Cru</span>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#FB923C] opacity-80 border border-[#FB923C] border-dashed"></div>
-                    <span className="text-xs text-zinc-300">Premier Cru</span>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                    <div className="w-3 h-3 bg-[#A1A1AA] opacity-80 border border-[#A1A1AA]"></div>
-                    <span className="text-xs text-zinc-300">Village (Lieu-dit)</span>
-                </div>
-            </div>
         </div>
     );
 };
